@@ -19,7 +19,7 @@ class Cmd {
   ] as Comparator
 
   def commandMethods() {
-     return this.class.methods.findAll{ it.name =~ /^do_[A-z]/ }
+    return this.class.methods.findAll{ it.name =~ /^do_[A-z]/ }
   }
 
   def commandMethod(String name) {
@@ -31,7 +31,6 @@ class Cmd {
   }
 
   def commandDescription(Method m) {
-     m.annotations.each{println it}
      Option option = m.getAnnotation(Option.class)
      if (option == null)
        return null
