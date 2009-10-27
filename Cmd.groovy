@@ -18,6 +18,10 @@ class Cmd {
      return this.class.methods.findAll{ it.name =~ /^do_[A-z]/ }.collect{ it.name[3..-1] }
   }
 
+  def do_quit(List ignored) {
+    System.exit()
+  }
+
   def do_help(List messages) {
      messages.each { println it }            
      println "Available commands"
@@ -28,8 +32,8 @@ class Cmd {
      reader.addCompletor(new SimpleCompletor (commands() as String[]))
      while (true) {
        String line = reader.readLine(prompt);
-       if (line == null || line == "quit") {
-         if (line == null) println ""
+       if (line == null) {
+         println ""
          break;
        }
        invoke(line)
