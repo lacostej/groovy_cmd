@@ -1,5 +1,6 @@
 class Example extends Cmd {
 
+  @Option(description="Hello world")
   def do_hello(List argList) {
     print "Hello "
     for (i in 0..<argList.size()) {

@@ -14,22 +14,66 @@ class Cmd {
   ConsoleReader reader = new ConsoleReader()
   String prompt = "> "
 
-  def commands() {
-     return this.class.methods.findAll{ it.name =~ /^do_[A-z]/ }.collect{ it.name[3..-1] }
+  def mc = [
+   compare: {a, b -> a[0].equals(b[0]) ? 0 : a[0] < b[0] ? -1 : 1 }
+  ] as Comparator
+
+  def commandMethods() {
+     return this.class.methods.findAll{ it.name =~ /^do_[A-z]/ }
   }
 
-  def do_quit(List ignored) {
-    System.exit()
+  def commandMethod(String name) {
+    return commandMethods().find{ commandName(it) == name }
   }
 
-  def do_help(List messages) {
-     messages.each { println it }            
-     println "Available commands"
-     commands().sort().each { println it }
+  def commandName(Method m) {
+     return m.name[3..-1]
+  }
+
+  def commandDescription(Method m) {
+     m.annotations.each{println it}
+     Option option = m.getAnnotation(Option.class)
+     if (option == null)
+       return null
+     return option.description()
+  }
+
+
+  def commandNames() {
+     return commandMethods().collect{ commandName(it) }
+  }
+
+  def methodHelp(Method m) {
+    String desc = commandDescription(m)
+    if (desc == null)
+      return commandName(m)
+     else
+      return commandName(m) + ": " + desc
    }
 
+  @Option(description="Terminates interpreter")
+  def do_quit(List ignored) {
+    System.exit(0)
+  }
+
+  @Option(description="Display global help or per command help")
+  def do_help(List args) {
+    if (args != null && args.size() > 0) {
+      Method m = commandMethod(args[0])
+      if (m == null)
+        println "ERROR Unknown command: " + args[0]
+      else
+        println methodHelp(m)
+      return
+    }
+    println "Available commands:"
+    commandMethods().collect{ [commandName(it), methodHelp(it)]}.sort(mc).each {
+      println it[1]
+    }
+  }
+
   def run() {
-     reader.addCompletor(new SimpleCompletor (commands() as String[]))
+     reader.addCompletor(new SimpleCompletor (commandNames() as String[]))
      while (true) {
        String line = reader.readLine(prompt);
        if (line == null) {
@@ -41,11 +85,24 @@ class Cmd {
   }
   def invoke(line) {
     String[] args = line.split(" ")
-    List passed_args = args.size() > 1 ? args[1..-1] : [ null ]
-    Method method = this.getClass().getMethods().find{ it.name == 'do_' + args[0] }
-    if (method == null)
-      do_help(["ERROR Unknown command: " + args[0]])
-    else
-      method.invoke( this, passed_args )
+    List passed_args = args.size() > 1 ? args[1..-1] : [ ]
+    Method method = commandMethod(args[0])
+    if (method == null) {
+      println "ERROR Unknown command: " + args[0]
+      do_help()
+    } else {
+      try {
+        if (method.getParameterTypes().size() == 0) {
+          method.invoke( this )
+        } else if (method.getParameterTypes()[0] == List.class) {
+          method.invoke( this, passed_args )
+        } else {
+          println "ERROR: " + method.name + " has non expected parameter type: " + method.getParameterTypes()[0].class
+        }
+      } catch (Exception e) {
+        print e
+        e.printStackTrace()
+      }
+    }
   }
 }
