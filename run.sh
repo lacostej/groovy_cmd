@@ -1,1 +1,1 @@
-groovy -cp jline-0.9.94.jar:. Example.groovy
+groovy -cp jline-0.9.94.jar:. example.groovy < commands.txt
