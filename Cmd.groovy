@@ -82,6 +82,11 @@ class Cmd {
        invoke(line)
      }
   }
+
+  def argTypesAreString(Method method) {
+    return method.getParameterTypes().find{ it != String.class } == null
+  }
+
   def invoke(line) {
     String[] args = line.split(" ")
     List passed_args = args.size() > 1 ? args[1..-1] : [ ]
@@ -95,12 +100,15 @@ class Cmd {
           method.invoke( this )
         } else if (method.getParameterTypes()[0] == List.class) {
           method.invoke( this, passed_args )
+        } else if (argTypesAreString(method)) {
+          println(passed_args.size())
+          method.invoke( this, passed_args.toArray() )
         } else {
-          println "ERROR: " + method.name + " has non expected parameter type: " + method.getParameterTypes()[0].class
+          println "ERROR: " + method.name + " has non expected parameter type: " + method.getParameterTypes().find{ it != String.class }
         }
       } catch (Exception e) {
-        print e
-        e.printStackTrace()
+        println "ERROR " + e.getMessage()
+        //e.printStackTrace()
       }
     }
   }

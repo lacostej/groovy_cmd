@@ -1,4 +1,7 @@
 help
 hello "world jean"
+hello2 world jean
+hello2 world jean toomany
+unsupportedArgs hi ho
 help help
 help hello
