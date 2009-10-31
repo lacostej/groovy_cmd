@@ -95,8 +95,7 @@ class Cmd {
     List passed_args = args.size() > 1 ? args[1..-1] : [ ]
     Method method = commandMethod(args[0])
     if (method == null) {
-      println "ERROR Unknown command: " + args[0]
-      do_help()
+      println "ERROR Unknown command: " + args[0] + ". Use help for a detailed list of available commands"
     } else {
       try {
         if (method.getParameterTypes().size() == 0) {
