@@ -75,12 +75,12 @@ class Cmd {
      reader.addCompletor(new SimpleCompletor (commandNames() as String[]))
      while (true) {
        String line = reader.readLine(prompt);
-       if (line.size() == 0) {
-         continue
-       }
        if (line == null) {
          println ""
          break;
+       }
+       if (line.size() == 0) {
+         continue
        }
        invoke(line)
      }
