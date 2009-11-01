@@ -103,7 +103,6 @@ class Cmd {
         } else if (method.getParameterTypes()[0] == List.class) {
           method.invoke( this, passed_args )
         } else if (argTypesAreString(method)) {
-          println(passed_args.size())
           method.invoke( this, passed_args.toArray() )
         } else {
           println "ERROR: " + method.name + " has non expected parameter type: " + method.getParameterTypes().find{ it != String.class }
