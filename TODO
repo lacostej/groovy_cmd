@@ -1,1 +1,5 @@
+* better dependency packaging
+* better shell support.
+** lcd ?
+** E.g. "ls *.groovy" doesn't work as we don't wrap in a shell. Maybe use plexus-utils
 * add a mechanism to display per option help / smart completion ? E.g. with annotations

@@ -55,6 +55,19 @@ class Cmd {
     System.exit(0)
   }
 
+  @Option(description="Pass command to a system shell when line begins with '!'")
+  def do_shell(String command) {
+    try {
+      def proc = command.execute()
+      proc.waitFor()
+      print proc.in.text
+      print proc.err.text
+    } catch (Exception e) {
+      println "ERROR " + e.getMessage()
+    }
+  }
+
+
   @Option(description="Display global help or per command help")
   def do_help(List args) {
     if (args != null && args.size() > 0) {
@@ -82,7 +95,10 @@ class Cmd {
        if (line.size() == 0) {
          continue
        }
-       invoke(line)
+       if (line.startsWith("!"))
+         do_shell(line[1..-1])
+       else
+         invoke(line)
      }
   }
 
